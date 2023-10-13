@@ -15,9 +15,10 @@ def calculate_ndvi(image):
 
 
 def initialize_gee():
+    # Initialize Google Earth Engine
     credentials = ee.ServiceAccountCredentials(
         email=settings.GEE_ACCOUNT,
-        key_file=settings.GEE_JSON_KEY_FILE,
+        key_data=settings.GEE_PRIVATE_KEY,
     )
     ee.Initialize(credentials)
 
