@@ -20,6 +20,8 @@ def initialize_gee():
         email=settings.GEE_ACCOUNT,
         key_file=settings.GEE_JSON_KEY_FILE,
     )
+    if credentials is None:
+        return JsonResponse({'message': 'Some issue'})
     ee.Initialize(credentials)
 
 
@@ -86,6 +88,7 @@ def average_ndvi(request):
 def point_wise_ndvi(request):
     if request.method == 'POST':
         if check_gee_initialized():
+            print(request.body)
             start_time = time.time()
             postData = json.loads(request.body)
             polygon_point_list = postData['polyon_Point_List']
