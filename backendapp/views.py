@@ -6,7 +6,6 @@ import ee
 import time
 from django.shortcuts import render
 import math
-import ee
 from django.conf import settings
 
 
@@ -20,8 +19,6 @@ def initialize_gee():
         email=settings.GEE_ACCOUNT,
         key_file=settings.GEE_JSON_KEY_FILE,
     )
-    if credentials is None:
-        return JsonResponse({'message': 'Some issue'})
     ee.Initialize(credentials)
 
 
