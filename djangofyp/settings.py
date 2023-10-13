@@ -150,9 +150,7 @@ AUTH_USER_MODEL = 'users.User'
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
-GEE_JSON_KEY_FILE = os.path.join(
-    BASE_DIR, 'djangofyp\\first-parser-394719-161b1e1e6ec6.json')
-
+GEE_JSON_KEY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'first-parser-394719-161b1e1e6ec6.json')
 # The service account email associated with the key
 GEE_ACCOUNT = 'moeiz-shahzad@first-parser-394719.iam.gserviceaccount.com'
 
@@ -160,6 +158,8 @@ GEE_ACCOUNT = 'moeiz-shahzad@first-parser-394719.iam.gserviceaccount.com'
 GEE_PRIVATE_KEY = '''
 -----BEGIN PRIVATE KEY-----\nMIIEuwIBADANBgkqhkiG9w0BAQEFAASCBKUwggShAgEAAoIBAQCkhT9MNW806hoP\nv4BcFHaWi5qJ3HC6kMuBDfKLCcUtrxD0Ni3DxWCzGpXYvBsaU4Q706l6k3kzl5N+\nzdVp/7Wsl0ThnhX/WoYKuObO8Z5FOu2pqNCJdAQ/CIHy+6FoGYMpGrmoNW1dr8aK\nKv0rOy/gt9AuDdsu+jMIeO+O2oetfxNkCasiIc8yLcSynwkFjEkqGOECkRwyDhhr\npm4IZfrWOYdQWqI6932mZ69Sq7oaRklqfNUVJcv1XYBVfM/49Q1nQalNH/ys0CZb\nyY4eNZPb4xg7GX64xVQIOAEUPoCSfm74/K0hdb9EAbv6dfXYDGYQns1EyQThCJQV\n4OtRNBG/AgMBAAECggEADxk1bmqG+q2zV5elEY5FNdq5A4bqB40rR/w+Mplicadb\n4HWqbImMLtO1Rc85k4hvncf2iUvIdz4laKE+QTyY8S5uwV/vN+CYZZqDgCF3e3YF\ngqj9/mdZzmka9/A052dT/K05taC1mT/88ggw9Ms5QR/NaLSX1W9byJ7EqXEPu5HE\nmqrh4BHoG6IIo6KwbStdy7QfdDzqTRG2Y9dyubo/DhjR/0zKUyO3P3CGxbDFh9Jo\nXgKOmSM25gHgE7Kak4HPkiocUxonxvUA3dd9BJ/gjfgDEIaU2tcp50ZCsULN1+Xf\nHBcRGyHFFtQCb7lVCiMNH2uFcnopmFcbByZHe20UOQKBgQDjF5BhvCD/OVxRNiZP\nI/iU2EUk0QfgTrMl/rlwIEdws1Oy+rzAE7GubTC+UxJeRUCudVeHDkouzwO+XhjE\nrOZBp9ngZLXWlmJvV4yfz9FI2WF8ulpXsFbhplW0jBjyFiL+EPWMJdQdj0fW/Wkk\nducvuUvUdUa2BSoEMfYmL7iLiQKBgQC5dpzN7EI5suE7D4luBGcpr7R8kQiVS0Yy\n6EhUtUctDlLPXuImg4yegKrlwJpOlz4/6sjfdYKs3iEk7JJn3mAssBMgN+y36Asa\nIgnyBpdRw0DuKQQ3otok5chAVhz0Si/FLy/gFgFDW+8RExuj4U0VYG032P7+4aDU\nMcDRW/D5BwKBgQCr3mmnjnpqrz7vN8xGmTLJc+TguFL9sJJlbyNpeQSYhyARlTLF\nLCKNoJYDdVuxfTg20RgtXuNGCecLbKvSLgkWJ7L94Tq97ZMSMXB8gwwh1mOxwlgd\nhZg7r2et/Vnj3l0dbDhqmTawKIB2ddPdhR/zPonlgdzCZaYnBqkEvZkuAQKBgGlK\nE188n6ROD1wOSAEzcrXR0G9fjzXilCnWgSnF+HB1z0F3JoCi8jQR6/OfUnsHlgmH\nax6hgdxOBxcFT2C0eHkmRNVnqnYFwDfH10mVwFZkuPn8Qy6qv5lu8i7ENI/jhhc1\n4MIg+/qXuLNC29A/2hkmsxqfkLR2t22ACW1R+w4FAn9Z5YU9tbmxYFtwaHMYpSHM\n64Csx5FzyvEvr2MlNO8jyfnnmQ8pFV0Nk4Lyn2qg8RM4DljMbG7shHXErcpbLn0p\nL+6J9xdFdXkbWecr5pe45eggb7ETlKb04g7i+9RWjBDBQir02O/Fe9OzcvIJZ8P9\nGH3hiwIBk9Q4dkkBYA0z\n-----END PRIVATE KEY-----\n
 '''
+
+print(GEE_JSON_KEY_FILE)
 
 
 def initialize_gee():
