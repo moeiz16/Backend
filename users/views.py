@@ -8,9 +8,7 @@ import jwt
 import datetime
 import ast
 import math
-from flask import request
 # Create your views here.
-
 
 class RegisterView(APIView):
     def post(self, request):
@@ -67,7 +65,6 @@ class RegisterView(APIView):
 
         return response
 
-
 class LoginView(APIView):
     def post(self, request):
         email = request.data['email']
@@ -82,11 +79,9 @@ class LoginView(APIView):
         if not user.check_password(password):
             raise AuthenticationFailed('Incorrect Password!')
 
-        jwt_exp_time = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
-
         payload = {
             'id': user.id,
-            'exp': jwt_exp_time,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=5),
             'iat': datetime.datetime.utcnow()
         }
 
@@ -115,8 +110,7 @@ class LoginView(APIView):
             job_records, many=True)
         response = Response()
 
-        response.set_cookie(key='jwt', value=token,
-                            httponly=True, expires=jwt_exp_time)
+        response.set_cookie(key='jwt', value=token, httponly=True)
         response.data = {
 
             'userid': user.id,
@@ -129,20 +123,6 @@ class LoginView(APIView):
             'crop_rotation_records': crop_rotation_serializer.data,
             'jobs': job_serializer.data
         }
-
-        # Check if the JWT has expired in a request
-        if 'jwt' in request.cookies:
-            jwt_token = request.cookies['jwt']
-            try:
-                payload = jwt.decode(jwt_token, 'secret', algorithms=['HS256'])
-                exp_time = datetime.datetime.utcfromtimestamp(payload['exp'])
-                current_time = datetime.datetime.utcnow()
-                if current_time >= exp_time:
-                    # JWT has expired, so delete the cookie
-                    response.delete_cookie('jwt')
-            except jwt.ExpiredSignatureError:
-                # JWT has expired, so delete the cookie
-                response.delete_cookie('jwt')
 
         return response
 
