@@ -162,21 +162,6 @@ def point_wise_ndvi(request):
         return JsonResponse({'error': 'Invalid request method'})
 
 
-def maskS2clouds(image):
-    # Select the QA60 band
-    qa = image.select('QA60')
-
-    # Bits 10 and 11 are clouds and cirrus, respectively.
-    cloudBitMask = 1 << 10
-    cirrusBitMask = 1 << 11
-
-    # Both flags should be set to zero, indicating clear conditions.
-    mask = qa.bitwiseAnd(cloudBitMask).eq(0) \
-        .And(qa.bitwiseAnd(cirrusBitMask).eq(0))
-
-    # Update the image mask and divide by 10000
-    return image.updateMask(mask).divide(10000)
-
 def polygon_point_wise_ndvi(request):
     if request.method == 'POST':
         if check_gee_initialized():
@@ -201,9 +186,8 @@ def polygon_point_wise_ndvi(request):
             sentinel2 = ee.ImageCollection("COPERNICUS/S2_SR")
             sentinel_collection = sentinel2 \
                 .filterDate(start_date, end_date) \
-                .filterBounds(polygon_geometry) \
-                .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE',10)) \
-                .map(maskS2clouds)
+                .filterBounds(polygon_geometry)
+
             # Create an EE Geometry MultiPoint from the list of points
             points_geometry = ee.Geometry.MultiPoint(
                 [ee.Geometry.Point(point['lng'], point['lat'])
