@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed, NotFound
 from rest_framework import status
+from flask import request
 from .serializers import UserSerializer, FarmsSerializer, SeasonsSerializer, FieldsSerializer, JobsSerializer, CropRotationSerializer, FieldJobRecordsSerializer
 from .models import User, Farms, Seasons, Fields, Jobs, CropDataRotation, FieldJobRecords
 import jwt
@@ -79,12 +80,15 @@ class LoginView(APIView):
         if not user.check_password(password):
             raise AuthenticationFailed('Incorrect Password!')
 
+        jwt_exp_time = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+
         payload = {
             'id': user.id,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=5),
+            'exp': jwt_exp_time,
             'iat': datetime.datetime.utcnow()
         }
 
+        #encoding the JWT
         token = jwt.encode(payload, 'secret', algorithm='HS256')
         # Fetch the user's fields and serialize them
         farms = Farms.objects.filter(user=user)
@@ -110,7 +114,7 @@ class LoginView(APIView):
             job_records, many=True)
         response = Response()
 
-        response.set_cookie(key='jwt', value=token, httponly=True)
+        response.set_cookie(key='jwt', value=token, httponly=True, expires=jwt_exp_time)
         response.data = {
 
             'userid': user.id,
@@ -123,6 +127,19 @@ class LoginView(APIView):
             'crop_rotation_records': crop_rotation_serializer.data,
             'jobs': job_serializer.data
         }
+        # Check if the JWT has expired in a request
+        if 'jwt' in request.cookies:
+            jwt_token = request.cookies['jwt']
+            try:
+                payload = jwt.decode(jwt_token, 'secret', algorithms=['HS256'])
+                exp_time = datetime.datetime.utcfromtimestamp(payload['exp'])
+                current_time = datetime.datetime.utcnow()
+                if current_time >= exp_time:
+                    # JWT has expired, so delete the cookie
+                    response.delete_cookie('jwt')
+            except jwt.ExpiredSignatureError:
+                # JWT has expired, so delete the cookie
+                response.delete_cookie('jwt')
 
         return response
 
