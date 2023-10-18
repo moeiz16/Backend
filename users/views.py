@@ -10,6 +10,7 @@ import ast
 import math
 # Create your views here.
 
+
 class RegisterView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
@@ -64,6 +65,7 @@ class RegisterView(APIView):
         }
 
         return response
+
 
 class LoginView(APIView):
     def post(self, request):
@@ -660,18 +662,17 @@ class CreateKMLFieldView(APIView):
                 if serializer.is_valid():
                     # Save the farm record
                     serializer.save()
+                    # Respond with a success message
+                    fields = Fields.objects.filter(farm_id_id=farm.farm_id)
+                    field_serializer = FieldsSerializer(fields, many=True)
+
+                    response = Response({
+                        'fields': field_serializer.data,
+                    })
+                    return response
                 else:
                     # If the serializer is not valid, return an error response
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-                    # Respond with a success message
-        fields = Fields.objects.filter(farm_id_id=farm.farm_id)
-        field_serializer = FieldsSerializer(fields, many=True)
-
-        response = Response({
-            'fields': field_serializer.data,
-        })
-        return response
 
 
 class UpdateFieldJobRecordView(APIView):
