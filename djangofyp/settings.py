@@ -147,10 +147,15 @@ ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'users.User'
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    'https://cropsight-dusky.vercel.app',
+    # Add any other domains you want to allow here.
+]
 
-GEE_JSON_KEY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'first-parser-394719-161b1e1e6ec6.json')
+GEE_JSON_KEY_FILE = os.path.join(os.path.dirname(
+    os.path.abspath(__file__)), 'first-parser-394719-161b1e1e6ec6.json')
 # The service account email associated with the key
 GEE_ACCOUNT = 'moeiz-shahzad@first-parser-394719.iam.gserviceaccount.com'
 
@@ -160,7 +165,6 @@ GEE_PRIVATE_KEY = '''
 '''
 
 
-
 def initialize_gee():
     # Initialize Google Earth Engine
     credentials = ee.ServiceAccountCredentials(
@@ -168,6 +172,6 @@ def initialize_gee():
         key_data=GEE_PRIVATE_KEY,
     )
     ee.Initialize(credentials)
-    
+
 
 initialize_gee()
