@@ -148,7 +148,6 @@ ALLOWED_HOSTS = ['*']
 AUTH_USER_MODEL = 'users.User'
 
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 GEE_JSON_KEY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'first-parser-394719-161b1e1e6ec6.json')
