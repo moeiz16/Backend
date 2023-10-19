@@ -611,10 +611,72 @@ class DisplayFieldDataView(APIView):
         return response
 
 
+# class CreateKMLFieldView(APIView):
+#     def post(self, request):
+#         # Extract data from the request
+
+#         farm = Farms.objects.filter(farm_id=request.data['farm_id']).first()
+#         if farm is None:
+#             raise NotFound('Farm not found!')
+
+#         coordinates_list = request.data['coordinates_list']
+#         names_list = request.data['field_names_list']
+#         areas_list = request.data['areas_list']
+
+#         if len(names_list) > 1:
+#             for i, element in enumerate(coordinates_list):
+#                 data = {
+#                     'farm_id': farm.farm_id,
+#                     'coordinates': str(coordinates_list[i]),
+#                     # The first one is always the name of the file
+#                     'field_name': names_list[i+1],
+#                     'area': areas_list[i],
+#                     'description': 'No description yet'
+#                 }
+
+#                 # Serialize the data
+#                 serializer = FieldsSerializer(data=data)
+
+#                 # Validate the serializer
+#                 if serializer.is_valid():
+#                     # Save the farm record
+#                     serializer.save()
+#                 else:
+#                     # If the serializer is not valid, return an error response
+#                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#         else:
+#             for i, element in enumerate(coordinates_list):
+#                 data = {
+#                     'farm_id': farm.farm_id,
+#                     'coordinates': str(coordinates_list[i]),
+#                     'field_name': 'No name yet',  # The first one is always the name
+#                     'area': areas_list[i],
+#                     'description': 'No description yet'
+#                 }
+
+#                 # Serialize the data
+#                 serializer = FieldsSerializer(data=data)
+
+#                 # Validate the serializer
+#                 if serializer.is_valid():
+#                     # Save the farm record
+#                     serializer.save()
+#                     # Respond with a success message
+#                     fields = Fields.objects.filter(farm_id_id=farm.farm_id)
+#                     field_serializer = FieldsSerializer(fields, many=True)
+
+#                     response = Response({
+#                         'fields': field_serializer.data,
+#                     })
+#                     return response
+#                 else:
+#                     # If the serializer is not valid, return an error response
+#                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class CreateKMLFieldView(APIView):
     def post(self, request):
         # Extract data from the request
-
         farm = Farms.objects.filter(farm_id=request.data['farm_id']).first()
         if farm is None:
             raise NotFound('Farm not found!')
@@ -623,58 +685,35 @@ class CreateKMLFieldView(APIView):
         names_list = request.data['field_names_list']
         areas_list = request.data['areas_list']
 
-        if len(names_list) > 1:
-            for i, element in enumerate(coordinates_list):
-                data = {
-                    'farm_id': farm.farm_id,
-                    'coordinates': str(coordinates_list[i]),
-                    # The first one is always the name of the file
-                    'field_name': names_list[i+1],
-                    'area': areas_list[i],
-                    'description': 'No description yet'
-                }
+        field_data = []
 
-                # Serialize the data
-                serializer = FieldsSerializer(data=data)
+        for i, element in enumerate(coordinates_list):
+            data = {
+                'farm_id': farm.farm_id,
+                'coordinates': str(coordinates_list[i]),
+                'field_name': names_list[i] if i < len(names_list) else 'No name yet',
+                'area': areas_list[i],
+                'description': 'No description yet'
+            }
+            field_data.append(data)
 
-                # Validate the serializer
-                if serializer.is_valid():
-                    # Save the farm record
-                    serializer.save()
-                else:
-                    # If the serializer is not valid, return an error response
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Serialize the data for all fields
+        serializer = FieldsSerializer(data=field_data, many=True)
 
+        # Validate the serializer
+        if serializer.is_valid():
+            # Save all the farm records in bulk
+            serializer.save()
+            fields = Fields.objects.filter(farm_id_id=farm.farm_id)
+            field_serializer = FieldsSerializer(fields, many=True)
+
+            response_data = {
+                'fields': field_serializer.data,
+            }
+            return Response(response_data)
         else:
-            for i, element in enumerate(coordinates_list):
-                data = {
-                    'farm_id': farm.farm_id,
-                    'coordinates': str(coordinates_list[i]),
-                    'field_name': 'No name yet',  # The first one is always the name
-                    'area': areas_list[i],
-                    'description': 'No description yet'
-                }
-
-                # Serialize the data
-                serializer = FieldsSerializer(data=data)
-
-                # Validate the serializer
-                if serializer.is_valid():
-                    # Save the farm record
-                    serializer.save()
-                    # Respond with a success message
-                    fields = Fields.objects.filter(farm_id_id=farm.farm_id)
-                    field_serializer = FieldsSerializer(fields, many=True)
-
-                    response = Response({
-                        'fields': field_serializer.data,
-                    })
-                    return response
-                else:
-                    # If the serializer is not valid, return an error response
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
+            # If the serializer is not valid, return an error response
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class UpdateFieldJobRecordView(APIView):
     def put(self, request, job_record_id):
 
