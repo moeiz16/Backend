@@ -344,6 +344,53 @@ class CreateCropRotationView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class CreateMultipleCropRotationView(APIView):
+    def post(self, request):
+        print("Call was made")
+        # # Extract data from the request
+
+        season = Seasons.objects.filter(
+            season_id=request.data['season_id']).first()
+        if season is None:
+            raise NotFound('Season not found!')
+
+        fields = request.data['fields']
+        for index in fields:
+            field = Fields.objects.filter(
+                field_id=index.field_id).first()
+
+            if field is None:
+                raise NotFound('Field not found!')
+
+            data = {
+                'field_id': field.field_id,
+                'season_id': season.season_id,
+                'crop_type': request.data['crop_type'],
+                'sown_date': request.data['sown_date'],
+                'harvest_date': request.data['harvest_date']
+
+            }
+            # Serialize the data
+            serializer = CropRotationSerializer(data=data)
+
+            # Validate the serializer
+            if serializer.is_valid():
+                # Save the farm record
+                serializer.save()
+
+        crop_rotation_records = CropDataRotation.objects.filter(
+            season_id_id=season.season_id)
+        crop_rotation_serializer = CropRotationSerializer(
+            crop_rotation_records, many=True)
+
+        response = Response()
+
+        response.data = {
+            'crop_rotation_records': crop_rotation_serializer.data
+        }
+        return response
+
+
 class CreateFieldJobRecordView(APIView):
     def post(self, request):
         # Extract data from the request

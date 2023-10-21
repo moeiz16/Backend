@@ -1,7 +1,7 @@
 from django.urls import path, include
 # from .views import RegisterView, LoginView, UserView, LogoutView, CreateFieldView, MyView, DeleteFieldView
 
-from .views import RegisterView, CreateFarmView, CreateSeasonView, LoginView, CreateFieldView, CreateJobView, CreateCropRotationView, CreateFieldJobRecordView, LogoutView, DisplayFieldsbyFarmView, UpdateFieldView, DeleteFieldView, DisplaySeasonCropRotationDataView, UpdateCropRotationView, CreateFieldJobRecordsView, DisplayFieldDataView, CreateKMLFieldView, UpdateFieldJobRecordView
+from .views import RegisterView, CreateFarmView, CreateSeasonView, LoginView, CreateFieldView, CreateJobView, CreateCropRotationView, CreateFieldJobRecordView, LogoutView, DisplayFieldsbyFarmView, UpdateFieldView, DeleteFieldView, DisplaySeasonCropRotationDataView, UpdateCropRotationView, CreateFieldJobRecordsView, DisplayFieldDataView, CreateKMLFieldView, UpdateFieldJobRecordView, CreateMultipleCropRotationView
 urlpatterns = [
     path('register', RegisterView.as_view()),
     path('login', LoginView.as_view()),
@@ -15,6 +15,7 @@ urlpatterns = [
     path('createseason', CreateSeasonView.as_view()),
     path('createjob', CreateJobView.as_view()),
     path('createcroprotation', CreateCropRotationView.as_view()),
+    path('createmultiplecroprotation', CreateMultipleCropRotationView.as_view()),
     path('createfieldjobrecord', CreateFieldJobRecordView.as_view()),
     path('displayfarmfields/<int:farm_id>', DisplayFieldsbyFarmView.as_view()),
     path('displayseasoncroprotation/<int:season_id>',
