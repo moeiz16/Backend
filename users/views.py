@@ -766,13 +766,12 @@ class UpdateFieldJobRecordView(APIView):
 
 class DisplayJobDataView(APIView):
     def post(self, request, job_id):
-        job = Jobs.objects.filter(job_id=job_id).first()
 
         field_job_records = FieldJobRecords.objects.filter(
-            job_id_id=job.job_id)
+            job_id_id=job_id)
         field_job_records_data = FieldJobRecordsSerializer(
-            field_job_records, many=True).data
-
+            field_job_records, many=True)
+        print(field_job_records_data.data)
         response = Response()
         response.data = {
             'field_job_records': field_job_records_data.data,
