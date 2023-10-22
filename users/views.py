@@ -778,3 +778,49 @@ class DisplayJobDataView(APIView):
 
         }
         return response
+
+
+class UpdateFieldJobDataView(APIView):
+    def put(self, request, job_id):
+
+        try:
+            job = Jobs.objects.get(
+                job_id=job_id)
+        except Jobs.DoesNotExist:
+            raise NotFound('Job not found')
+        
+        job.job_title = request.data['job_title']
+        job.due_date = request.data['due_date']
+        job.save()
+
+        fields = request.data['fields']
+        print(fields)
+        for field in fields:
+            field = Fields.objects.filter(
+                field_id=field['field_id']).first()
+            if field is None:
+                raise NotFound('Field not found!')
+
+            field_data = {
+                'field_id': field.field_id,
+                'job_id': job.job_id,
+                'status': False,
+                'complete_date': "2000-01-01"
+            }
+            # Serialize the data
+            field_job_record_serializer = FieldJobRecordsSerializer(
+                data=field_data)
+
+            # Validate the serializer
+            if field_job_record_serializer.is_valid():
+                # Save the farm record
+                field_job_record_serializer.save()
+        # Respond with a success message
+        jobs = Jobs.objects.filter(
+            farm_id_id=request.data['farm_id'], season_id_id=request.data['season_id'])
+        jobs_serializer = JobsSerializer(jobs, many=True)
+
+        response = Response({
+            'jobs': jobs_serializer.data,
+        })
+        return response

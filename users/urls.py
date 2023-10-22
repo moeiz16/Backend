@@ -1,7 +1,7 @@
 from django.urls import path, include
 # from .views import RegisterView, LoginView, UserView, LogoutView, CreateFieldView, MyView, DeleteFieldView
 
-from .views import RegisterView, CreateFarmView, CreateSeasonView, LoginView, CreateFieldView, CreateJobView, CreateCropRotationView, CreateFieldJobRecordView, LogoutView, DisplayFieldsbyFarmView, UpdateFieldView, DeleteFieldView, DisplaySeasonCropRotationDataView, UpdateCropRotationView, CreateFieldJobRecordsView, DisplayFieldDataView, CreateKMLFieldView, UpdateFieldJobRecordView, CreateMultipleCropRotationView, DisplayJobDataView
+from .views import RegisterView, CreateFarmView, CreateSeasonView, LoginView, CreateFieldView, CreateJobView, CreateCropRotationView, CreateFieldJobRecordView, LogoutView, DisplayFieldsbyFarmView, UpdateFieldView, DeleteFieldView, DisplaySeasonCropRotationDataView, UpdateCropRotationView, CreateFieldJobRecordsView, DisplayFieldDataView, CreateKMLFieldView, UpdateFieldJobRecordView, CreateMultipleCropRotationView, DisplayJobDataView, UpdateFieldJobDataView
 urlpatterns = [
     path('register', RegisterView.as_view()),
     path('login', LoginView.as_view()),
@@ -27,5 +27,8 @@ urlpatterns = [
     path('createkmlfields', CreateKMLFieldView.as_view()),
     path('updatefieldjobrecord/<int:job_record_id>',
          UpdateFieldJobRecordView.as_view()),
+     path('updatefieldjobdata/<int:job_id>', UpdateFieldJobDataView.as_view()),
+    
     path('displayjobdata/<int:job_id>', DisplayJobDataView.as_view()),
+
 ]
