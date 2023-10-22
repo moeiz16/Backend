@@ -346,7 +346,7 @@ class CreateCropRotationView(APIView):
 
 class CreateMultipleCropRotationView(APIView):
     def post(self, request):
-   
+
         # # Extract data from the request
 
         season = Seasons.objects.filter(
@@ -355,14 +355,13 @@ class CreateMultipleCropRotationView(APIView):
             raise NotFound('Season not found!')
 
         fields = request.data['fields']
-        
+
         for index in fields:
             field = Fields.objects.filter(
                 field_id=index['field_id']).first()
 
             if field is None:
                 raise NotFound('Field not found!')
-            
 
             data = {
                 'field_id': field.field_id,
@@ -372,7 +371,7 @@ class CreateMultipleCropRotationView(APIView):
                 'harvest_date': request.data['harvest_date']
 
             }
-           
+
             # Serialize the data
             serializer = CropRotationSerializer(data=data)
 
@@ -762,4 +761,21 @@ class UpdateFieldJobRecordView(APIView):
 
         })
 
+        return response
+
+
+class DisplayJobDataView(APIView):
+    def post(self, request, job_id):
+        job = Jobs.objects.filter(job_id=job_id).first()
+
+        field_job_records = FieldJobRecords.objects.filter(
+            job_id_id=job.job_id)
+        field_job_records_data = FieldJobRecordsSerializer(
+            field_job_records, many=True).data
+
+        response = Response()
+        response.data = {
+            'field_job_records': field_job_records_data.data,
+
+        }
         return response
