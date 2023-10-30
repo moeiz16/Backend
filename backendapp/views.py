@@ -247,7 +247,7 @@ def ndvi_heterogeneity(request):
         if check_gee_initialized():
             start_time = time.time()
             postData = json.loads(request.body)
-            polygon_list = postData['polygonList']
+            polygon_list = postData['polygon']
             start_date = postData['startDate']
             end_date = postData['endDate']
 
