@@ -7,6 +7,7 @@ import time
 from django.shortcuts import render
 import math
 from django.conf import settings
+import numpy as np
 
 
 def calculate_ndvi(image):
@@ -238,5 +239,65 @@ def polygon_point_wise_ndvi(request):
             initialize_gee()
             return JsonResponse({'messgae': 'EE is initialized now'})
 
+    else:
+        return JsonResponse({'error': 'Invalid request method'})
+
+def ndvi_heterogeneity(request):
+    if request.method == 'POST':
+        if check_gee_initialized():
+            start_time = time.time()
+            postData = json.loads(request.body)
+            polygon_list = postData['polygonList']
+            start_date = postData['startDate']
+            end_date = postData['endDate']
+
+            sentinel2 = ee.ImageCollection("COPERNICUS/S2_SR")
+            collection = sentinel2 \
+                .filterDate(start_date, end_date)
+
+            ndvi_heterogeneity_list = []
+
+            for polygon in polygon_list:
+                polygon_vertices = polygon['coordinates']
+
+                # Convert the polygon vertices to Earth Engine format
+                polygon_coords = [(vertex['lng'], vertex['lat'])
+                                  for vertex in polygon_vertices]
+                polygon_geometry = ee.Geometry.Polygon([polygon_coords])
+                sentinel_collection = collection.filterBounds(polygon_geometry)
+
+                # Map the NDVI calculation function over the collection
+                sentinel_with_ndvi = sentinel_collection.map(calculate_ndvi)
+
+                # Select the NDVI band from the processed collection
+                ndvi_collection = sentinel_with_ndvi.select('NDVI')
+
+                # Calculate NDVI values for the selected area and time frame
+                ndvi_values = ndvi_collection.reduceRegion(
+                    reducer=ee.Reducer.toList(),
+                    geometry=polygon_geometry,
+                    scale=10
+                )
+
+                # Extract NDVI values as a list
+                ndvi_list = ee.List(ndvi_values.get('NDVI'))
+
+                # Calculate NDVI heterogeneity (standard deviation)
+                ndvi_array = np.array(ndvi_list.getInfo())
+                ndvi_std = np.std(ndvi_array)
+
+                ndvi_heterogeneity_list.append({
+                    'polygonVertices': polygon_vertices,
+                    'ndviHeterogeneity': ndvi_std
+                })
+
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            print(f"Total time taken: {elapsed_time:.2f} seconds")
+
+            return JsonResponse({'ndviHeterogeneityList': ndvi_heterogeneity_list})
+        else:
+            initialize_gee()
+            return JsonResponse({'message': 'EE is initialized now'})
     else:
         return JsonResponse({'error': 'Invalid request method'})
