@@ -7,4 +7,5 @@ urlpatterns = [
     path('average/', views.average_ndvi),
     path('polygonpointwise/', views.polygon_point_wise_ndvi),
     path('heterogeneity/', views.ndvi_heterogeneity),
+    path('modelprediction/',views.model_prediction)
 ]
