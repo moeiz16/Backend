@@ -8,7 +8,7 @@ from django.shortcuts import render
 import math
 from django.conf import settings
 import numpy as np
-
+import pandas as pd
 
 def calculate_ndvi(image):
     ndvi = image.normalizedDifference(['B8', 'B4'])
@@ -352,7 +352,7 @@ def model_prediction(request):
         NASA_srtm = ee.Image("USGS/SRTMGL1_003");
 
         #------------------------Modis------------------------
-        modis_lai_data = ee.ImageCollection('MODIS/061/MCD15A3H');
+     
         modis_vegetation_data = ee.ImageCollection("MODIS/061/MYD13Q1")
         modis_weather_data = ee.ImageCollection("MODIS/061/MOD21C3")
 
@@ -421,13 +421,6 @@ def model_prediction(request):
             .filterDate(start_date, end_date) \
             .filterBounds(roi)
 
-
-            USDA_SoilData_data = USDA_SoilData \
-            .filterDate(start_date, end_date) \
-            .filterBounds(roi)
-
-            if(USDA_SoilData_data.size().getInfo()==0):
-                usda_flag = False
 
             sentinel_2_imagery = sentinel2_data.median().select(['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B11', 'B12', 'NDVI', 'EVI', 'GNDVI','SAVI','VCI', 'TVI', 'BI', 'BI2', 'CI', 'CI1', 'SATVI', 'HVSI', 'SOCI', 'ASI', 'BSI', 'MSAVI'])
             modis_vegetation_imagery = modis_vegetation.mosaic().select('NDVI','EVI')
