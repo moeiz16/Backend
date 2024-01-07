@@ -31,14 +31,12 @@ def check_gee_initialized():
 def average_ndvi(request):
     if(request.method == 'POST'):
         if check_gee_initialized():
-            print(request.body)
-            start_time = time.time()
+
             postData = json.loads(request.body)
-            print(request.body)
-            polygon_list = postData['polygonList']
+            polygon = postData['polygon']
             start_date = postData['startDate']
             end_date = postData['endDate']
-
+     
             sentinel2 = ee.ImageCollection("COPERNICUS/S2_SR")
             collection = sentinel2 \
                 .filterDate(start_date, end_date) \
@@ -46,35 +44,31 @@ def average_ndvi(request):
 
             average_ndvi_computed_list = []
 
-            for polygon in polygon_list:
-                polygon_vertices = polygon['coordinates']
 
-                # Convert the polygon vertices to Earth Engine format
-                polygon_coords = [(vertex['lng'], vertex['lat'])
-                                  for vertex in polygon_vertices]
-                polygon_geometry = ee.Geometry.Polygon([polygon_coords])
-                sentinel_collection = collection.filterBounds(polygon_geometry)
-                # Map the NDVI calculation function over the collection
-                sentinel_with_ndvi = sentinel_collection.map(calculate_ndvi)
+            polygon_vertices = polygon['coordinates']
 
-                # Select the NDVI band from the processed collection
-                ndvi_collection = sentinel_with_ndvi.select('NDVI')
-                # Calculate the average NDVI for the selected area and time frame
-                average_ndvi = ndvi_collection.mean().reduceRegion(
-                    reducer=ee.Reducer.mean(),
-                    geometry=polygon_geometry,
-                    scale=10
-                )
+            # Convert the polygon vertices to Earth Engine format
+            polygon_coords = [(vertex['lng'], vertex['lat'])
+                                for vertex in polygon_vertices]
+            polygon_geometry = ee.Geometry.Polygon([polygon_coords])
+            sentinel_collection = collection.filterBounds(polygon_geometry)
+            # Map the NDVI calculation function over the collection
+            sentinel_with_ndvi = sentinel_collection.map(calculate_ndvi)
 
-                # Get the average NDVI value
-                average_ndvi_value = average_ndvi.get('NDVI').getInfo()
-                print(average_ndvi_value)
-                average_ndvi_computed_list.append(
-                    {'averageNDVI': average_ndvi_value, 'polygonVertices': polygon_vertices})
+            # Select the NDVI band from the processed collection
+            ndvi_collection = sentinel_with_ndvi.select('NDVI')
+            # Calculate the average NDVI for the selected area and time frame
+            average_ndvi = ndvi_collection.mean().reduceRegion(
+                reducer=ee.Reducer.mean(),
+                geometry=polygon_geometry,
+                scale=10
+            )
 
-            end_time = time.time()
-            elapsed_time = end_time - start_time
-            print(f"Total time taken: {elapsed_time:.2f} seconds")
+            # Get the average NDVI value
+            average_ndvi_value = average_ndvi.get('NDVI').getInfo()
+           
+            average_ndvi_computed_list.append(
+                {'averageNDVI': (math.ceil(average_ndvi_value * 100) / 100), 'polygonVertices': polygon_vertices})
 
             return JsonResponse({'computedAverageNDVIList': average_ndvi_computed_list})
         else:
